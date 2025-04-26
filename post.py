@@ -4,12 +4,21 @@ import re
 import time
 import random
 from requests.exceptions import RequestException
+from sys import stdout
 
 # Clear screen
 def clear_screen():
     os.system("clear" if os.name == "posix" else "cls")
 
-# Print logo
+# Animated print
+def slow_print(text, delay=0.005):
+    for char in text:
+        stdout.write(char)
+        stdout.flush()
+        time.sleep(delay)
+    print()
+
+# Logo with animation
 def print_logo():
     clear_screen()
     logo = """
@@ -26,29 +35,33 @@ def print_logo():
 \033[1;33m[=] FACEBOOK           : PARDHAN KIING                              [=]
 \033[1;32m<<══════════════════════════════════════════════════════════════════>>
 """
-    print(logo)
+    slow_print(logo, 0.001)
 
-# Input helpers
+# Input helper
 def get_input(prompt, color="\033[92m"):
     return input(f"{color}{prompt} :: ")
 
-def get_commenter_name():
-    return get_input("H9TT3R N9M3", "\033[1;32m")
-
-# Token extraction from cookie
-def extract_token(cookie):
+# Extract token + name + id
+def extract_token_data(cookie):
     try:
         headers = {
             'Cookie': cookie,
-            'User-Agent': 'Mozilla/5.0 (Linux; Android 11; RMX2144 Build/RKQ1.201217.002) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.71 Mobile Safari/537.36'
+            'User-Agent': random.choice([
+                'Mozilla/5.0 (Linux; Android 12)', 'Mozilla/5.0 (Windows NT 10.0; Win64)',
+                'Mozilla/5.0 (iPhone; CPU iPhone OS 15_2 like Mac OS X)'
+            ])
         }
-        response = requests.get('https://business.facebook.com/business_locations', headers=headers)
-        token = re.search(r'(EAAG\w+)', response.text)
+        r = requests.get('https://business.facebook.com/business_locations', headers=headers)
+        token = re.search(r'(EAAG\w+)', r.text)
         if token:
-            return token.group(1)
+            token = token.group(1)
+            prof = requests.get(f'https://graph.facebook.com/me?fields=id,name&access_token={token}').json()
+            name = prof.get('name', 'Unknown')
+            uid = prof.get('id', 'N/A')
+            return token, uid, name
     except:
-        return None
-    return None
+        return None, None, None
+    return None, None, None
 
 # Comment sender
 def send_comment(token, post_id, message):
@@ -61,7 +74,7 @@ def send_comment(token, post_id, message):
     except Exception as e:
         return {'error': str(e)}
 
-# Main logic
+# Main
 def main():
     print_logo()
     print("\033[92mStart Time:", time.strftime("%Y-%m-%d %H:%M:%S"))
@@ -90,7 +103,7 @@ def main():
             continue
 
         post_id = get_input("ENT3R POST ID")
-        commenter_name = get_commenter_name()
+        commenter_name = get_input("H9TT3R N9M3", "\033[1;32m")
         delay = int(get_input("ENT3R D3LAY (S3C)"))
         comment_path = get_input("ENT3R YOUR C0MM3NT F1L3 P9TH")
 
@@ -104,18 +117,19 @@ def main():
         x, y = 0, 0
         while True:
             for cookie in cookie_list:
-                token = extract_token(cookie)
+                token, uid, name = extract_token_data(cookie)
                 if not token:
-                    print("\033[91m[!] T0K3N EXTR4CTI0N F41L3D")
+                    print("\033[91m[!] T0K3N EXTR4CTI0N F41L3D or BLOCKED")
                     continue
                 teks = comments[x % len(comments)]
                 final_comment = f"{commenter_name}: {teks}"
                 res = send_comment(token, post_id, final_comment)
                 if 'id' in str(res):
-                    print("\033[1;37mTARG3T P0ST ID ::", post_id)
-                    print("\033[1;30mDAT3 T1M3      ::", time.strftime("%Y-%m-%d %H:%M:%S"))
-                    print("\033[92mBROKEN NADEEM ::", final_comment)
-                    print('\033[1;33m' + '<<══════════════════════════════════════════════════════════════════>>')
+                    print(f"\033[1;32m[{x}] SUCC3SS")
+                    print(f"\033[1;37mUID : {uid} | N4M3 : {name}")
+                    print(f"\033[1;30mT1M3: {time.strftime('%H:%M:%S')}")
+                    print(f"\033[92mCOMM3NT: {final_comment}")
+                    print('\033[1;33m' + '══════════════════════════════════════════════════════════════════')
                     x += 1
                 else:
                     y += 1

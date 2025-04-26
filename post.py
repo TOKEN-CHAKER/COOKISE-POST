@@ -1,142 +1,214 @@
 import requests
+
 import os
+
 import re
+
 import time
+
 import random
+
 from requests.exceptions import RequestException
-from sys import stdout
 
-# Clear screen
+
+
+# Function to clear the terminal screen
+
 def clear_screen():
-    os.system("clear" if os.name == "posix" else "cls")
 
-# Animated print
-def slow_print(text, delay=0.005):
-    for char in text:
-        stdout.write(char)
-        stdout.flush()
-        time.sleep(delay)
-    print()
+    os.system("clear")
 
-# Logo with animation
-def print_logo():
-    clear_screen()
-    logo = """
-\033[1;32m____  _____       _       ______   _____  ____    ____     ______   
-\033[1;32m|_   \|_   _|     / \     |_   _ `. |_   _||_   \  /   _|  .' ___  |  
+
+
+# Function to set up the cookie
+
+def set_cookie():
+
+    Cookie = input("\033[1;37mENT3R YOUR COOKI3 :: ")
+
+    return Cookie
+
+
+
+# Function to prompt for commenter's name
+
+def get_commenter_name():
+
+    return input(" \033[1;32mH9TT3R N9M3  :: ")
+
+
+
+# Function to prompt for password
+
+def get_password():
+
+    return input("\033[92mENT3R P9SSWORD :: ")
+
+
+
+# Function to handle network requests
+
+def make_request(url, headers, cookies):
+
+    try:
+
+        response = requests.get(url, headers=headers, cookies=cookies).text
+
+        return response
+
+    except RequestException as e:
+
+        print("\033[91m[!] Error making request:", e)  # Bright Red color for errors
+
+        return None
+
+
+
+# Logo
+
+clear_screen()
+
+logo ="""
+ \033[1;32m____  _____       _       ______   _____  ____    ____     ______   
+\033[1;32m|_   \|_   _|     / \     |_   _ `.|_   _||_   \  /   _|  .' ___  |  
   \033[1;33m|   \ | |      / _ \      | | `. \ | |    |   \/   |   / .'   \_|  
   \033[1;32m| |\ \| |     / ___ \     | |  | | | |    | |\  /| |   | |    ___  
  \033[1;33m_| |_\   |_  _/ /   \ \_  _| |_.' /_| |_  _| |_\/_| |_  \ `.___]  | 
-\033[1;32m|_____|\____||____| |____||______.'|_____||_____||_____|  `._____.' 
+\033[1;32m|_____|\____||____| |____||______.'|_____||_____||_____|  `._____.'                                                
+
 \033[1;32m<<══════════════════════════════════════════════════════════════════>>
-\033[1;33m[=] OWNER              : BROKEN NADEEM                              [=]
-\033[1;32m[=] GITHUB             : BROKEN NADEEM                              [=]
-\033[1;36m[=] RULEX              : COOKISE POST                               [=]
-\033[1;33m[=] FACEBOOK           : PARDHAN KIING                              [=]
+\033[1;33m[=] OWNER                     : BROKEN NADEEM                      [=]
+\033[1;32m[=] 𝐆𝐈𝐓𝐇𝐔𝐁                    : BROKEN NADEEM                      [=]
+\033[1;36m[=] 𝐑𝐔𝐋𝐄𝐗                     : COOKISE POST                       [=]
+\033[1;33m[=] 𝐅𝐀𝐂𝐄𝐁𝐎𝐊                   : PARDHAN KIING                      [=]
 \033[1;32m<<══════════════════════════════════════════════════════════════════>>
 """
-    slow_print(logo, 0.001)
 
-# Input helper
-def get_input(prompt, color="\033[92m"):
-    return input(f"{color}{prompt} :: ")
+print(logo)
 
-# Extract token + name + id
-def extract_token_data(cookie):
+
+
+# Start time
+
+print("\033[92mStart Time:", time.strftime("%Y-%m-%d %H:%M:%S"))  
+
+
+
+# Login System
+
+
+
+
+while True:
+
     try:
-        headers = {
-            'Cookie': cookie,
-            'User-Agent': random.choice([
-                'Mozilla/5.0 (Linux; Android 12)', 'Mozilla/5.0 (Windows NT 10.0; Win64)',
-                'Mozilla/5.0 (iPhone; CPU iPhone OS 15_2 like Mac OS X)'
-            ])
-        }
-        r = requests.get('https://business.facebook.com/business_locations', headers=headers)
-        token = re.search(r'(EAAG\w+)', r.text)
-        if token:
-            token = token.group(1)
-            prof = requests.get(f'https://graph.facebook.com/me?fields=id,name&access_token={token}').json()
-            name = prof.get('name', 'Unknown')
-            uid = prof.get('id', 'N/A')
-            return token, uid, name
-    except:
-        return None, None, None
-    return None, None, None
 
-# Comment sender
-def send_comment(token, post_id, message):
-    try:
-        res = requests.post(
-            f'https://graph.facebook.com/{post_id}/comments/',
-            data={'message': message, 'access_token': token}
-        )
-        return res.json()
-    except Exception as e:
-        return {'error': str(e)}
+        print()
 
-# Main
-def main():
-    print_logo()
-    print("\033[92mStart Time:", time.strftime("%Y-%m-%d %H:%M:%S"))
+        cookies = set_cookie()
 
-    while True:
-        print("\n\033[1;36m[1] Single Cookie\n[2] Cookie File\n[3] Exit")
-        choice = input("\033[1;33mCHOOSE 0PTI0N :: ")
 
-        if choice == '3':
+
+        response = make_request('https://business.facebook.com/business_locations', headers={
+
+            'Cookie': cookies,
+
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 11; RMX2144 Build/RKQ1.201217.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/103.0.5060.71 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/375.1.0.28.111;]'
+
+        }, cookies={'Cookie': cookies})
+
+
+
+        if response is None:
+
             break
 
-        elif choice == '1':
-            cookie_list = [get_input("ENT3R YOUR COOKI3", "\033[1;37m")]
 
-        elif choice == '2':
-            file_path = get_input("ENT3R COOKI3 F1L3 P9TH", "\033[1;36m")
-            try:
-                with open(file_path, 'r') as f:
-                    cookie_list = [line.strip() for line in f if line.strip()]
-            except:
-                print("\033[91m[!] C0ULD N0T R34D F1L3")
-                continue
 
-        else:
-            print("\033[91m[!] INV4L1D 0PTI0N")
-            continue
+        token_eaag = re.search('(EAAG\w+)', str(response)).group(1)
 
-        post_id = get_input("ENT3R POST ID")
-        commenter_name = get_input("H9TT3R N9M3", "\033[1;32m")
-        delay = int(get_input("ENT3R D3LAY (S3C)"))
-        comment_path = get_input("ENT3R YOUR C0MM3NT F1L3 P9TH")
+        id_post = int(input(" \033[92mENT3R POST ID :: "))
 
-        try:
-            with open(comment_path, 'r') as f:
-                comments = [line.strip() for line in f if line.strip()]
-        except:
-            print("\033[91m[!] C0ULD N0T R34D C0MM3NT F1L3")
-            continue
+        commenter_name = get_commenter_name() 
+
+        delay = int(input(" \033[92mENT3R D3ALY S3COND3 :: "))  # Bright Green color for input prompt
+
+        comment_file_path = input(" \033[92mENT3R YOUR C0MM3NT F1L3 P9TH :: ")  # Bright Green color for input prompt
+
+
+
+        # Reading comments from the file
+
+        with open(comment_file_path, 'r') as file:
+
+            comments = file.readlines()
+
+
 
         x, y = 0, 0
+
+        print()
+
+
+
         while True:
-            for cookie in cookie_list:
-                token, uid, name = extract_token_data(cookie)
-                if not token:
-                    print("\033[91m[!] T0K3N EXTR4CTI0N F41L3D or BLOCKED")
-                    continue
-                teks = comments[x % len(comments)]
-                final_comment = f"{commenter_name}: {teks}"
-                res = send_comment(token, post_id, final_comment)
-                if 'id' in str(res):
-                    print(f"\033[1;32m[{x}] SUCC3SS")
-                    print(f"\033[1;37mUID : {uid} | N4M3 : {name}")
-                    print(f"\033[1;30mT1M3: {time.strftime('%H:%M:%S')}")
-                    print(f"\033[92mCOMM3NT: {final_comment}")
-                    print('\033[1;33m' + '══════════════════════════════════════════════════════════════════')
-                    x += 1
-                else:
-                    y += 1
-                    print(f"\033[91m[{y}] ST4TUS : F41L")
-                    print(f"\033[91m[/] LINK : https://m.facebook.com/{post_id}")
-                    print(f"\033[91m[/] COMM3NT : {final_comment}")
+
+            try:
+
                 time.sleep(delay)
 
-if __name__ == "__main__":
-    main()
+                teks = comments[x].strip()
+
+                comment_with_name = f"{commenter_name}: {teks}"  # Add commenter's name to the comment
+
+                data = {
+
+                    'message': comment_with_name,
+
+                    'access_token': token_eaag
+
+                }
+
+                response2 = requests.post(f'https://graph.facebook.com/{id_post}/comments/', data=data, cookies={'Cookie': cookies}).json()
+
+                if '\'id\':' in str(response2):
+
+                    print("\033[1;37mTARG3T P0ST ID ::", id_post)  # Post ID
+
+                    print("\033[1;30mDAT3 T1M3      ::", time.strftime("%Y-%m-%d %H:%M:%S"))  # Date time
+
+                    print("\033[92mBROKEN NADEEM::", comment_with_name)  # Comment sent with name
+
+                    print('\033[1;33m' + '<<══════════════════════════════════════════════════════════════════>>')  # Additional line in bright white color
+
+                    x = (x + 1) % len(comments)  # Move to the next comment
+
+                else:
+
+                    y += 1
+
+                    print("\033[91m[{}] Status : Failure".format(y))  # Bright Red color for failure message
+
+                    print("\033[91m[/]Link : https://m.basic.facebook.com//{}".format(id_post))  # Bright Red color for failure message
+
+                    print("\033[91m[/]Comments : {}\n".format(comment_with_name))  # Bright Red color for failure message
+
+                    continue
+
+
+
+            except RequestException as e:
+
+                print("\033[91m[!] Error making request:", e)  # Bright Red color for errors
+
+                time.sleep(5.5)
+
+                continue
+
+
+
+    except Exception as e:
+
+        print("\033[91m[!] An unexpected error occurred:", e)  # Bright Red color for errors
+
+        break
